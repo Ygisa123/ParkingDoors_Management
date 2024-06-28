@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarchÃ©</title>
+    <!-- Lien vers Bootstrap CSS (assurez-vous d'avoir Bootstrap installÃ© ou utilisez un CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Style pour centrer le contenu */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        }
+        .custom-label {
+            font-weight: bold;
+            font-size: 24px;
+            margin-left: 20px;
+        }
+        .custom-heading {
+            color: #007bff;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .custom-button {
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4 class="custom-heading">Informations du stationnement</h4>
+        <form action="http://raspberrypi.local:5000/result" method="POST">
+            <div class="mb-3 text-center">
+                 <div class="form-check d-flex justify-content-center">
+                       <input class="form-check-input" type="checkbox" name="porte" value="Porte" id="porte">
+                       <label class="form-check-label custom-label" for="porte">Ouvrir la porte</label>
+                 </div>
+                 <div class="mb-3">
+                      <h2 class="custom-label">La date et l'heure sur le serveur sont : {{ time_porte }}</h2>
+                 </div>
+                 <div class="mb-3">
+                      <h2 class="custom-label">Ã‰tat de la porte : {{ etat_porte }}</h2>
+                 </div>
+                 <div class="mb-3">
+                      <h2 class="custom-label">Nombre items : <span id="item-count">0</span></h2>
+                 </div>
+                 <div class="text-center">
+                      <button type="submit" class="btn btn-primary custom-link">Ouvrir</button>
+                 </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        // Fonction pour mettre à jour le nombre d'items en temps réel
+        function updateGlobalVariable() {
+            // Effectuez une requête AJAX vers la route Flask pour obtenir la variable globale
+            fetch('/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+               if (!response.ok) {
+                    throw new Error('Réponse non valide');
+                }
+                return response.json();
+             })
+            .then(data => {
+                // Mettez à jour la variable globale sur la page web
+                var globalVariable = data.items;
+                document.getElementById("item-count").textContent = globalVariable;
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération de la variable globale:', error);
+            });
+        }
+
+        // Rafraîchissez la variable globale toutes les 1000 millisecondes (1 seconde)
+        setInterval(updateGlobalVariable, 500);    
+    </script>
+</body>
+</html>
